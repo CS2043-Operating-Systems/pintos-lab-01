@@ -93,6 +93,24 @@ static bool higher_priority_ready(void) {
          thread_current()->priority;
 }
 
+/*Causes the current thread to yield CPU to the thread at the front*/
+void thread_preempt_if_needed(void) {
+  enum intr_level old_level;
+  bool should_preempt;
+
+  old_level = intr_disable();
+  should_preempt = higher_priority_ready();
+  intr_set_level(old_level);
+
+  if (!should_preempt)
+    return;
+
+  if (intr_context())
+    intr_yield_on_return();
+  else if (old_level == INTR_ON)
+    thread_yield();
+}
+
 /* Initializes the threading system by transforming the code
    that's currently running into a thread.  This can't work in
    general and it is possible in this case only because loader.S
