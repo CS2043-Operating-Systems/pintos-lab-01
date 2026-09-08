@@ -37,6 +37,14 @@ static void real_time_delay(int64_t num, int32_t denom);
 static bool wake_tick_less(const struct list_elem *a, const struct list_elem *b,
                            void *aux);
 
+static bool wake_tick_less(const struct list_elem *a, const struct list_elem *b,
+                           void *aux UNUSED) {
+  const struct thread *ta = list_entry(a, struct thread, elem);
+  const struct thread *tb = list_entry(b, struct thread, elem);
+
+  return ta->wake_tick < tb->wake_tick;
+}
+
 /* Sets up the timer to interrupt TIMER_FREQ times per second,
    and registers the corresponding interrupt. */
 void timer_init(void) {
