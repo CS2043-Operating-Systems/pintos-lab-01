@@ -157,6 +157,17 @@ static void interactive_shell(void) {
         break;
       }
 
+      /* Handle Backspace (ASCII '\b' or 127/DEL) */
+      if (c == '\b' || c == 127) {
+        if (length > 0) {
+          length--;
+          /* 1. Move cursor back, 2. Overwrite with space, 3. Move cursor back
+           * again */
+          printf("\b \b");
+        }
+        continue;
+      }
+
       if (length + 1 < sizeof command) {
         command[length++] = (char)c;
         putchar(c);
