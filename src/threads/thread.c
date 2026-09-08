@@ -74,6 +74,25 @@ static bool thread_priority_more(const struct list_elem *a,
                                  const struct list_elem *b, void *aux);
 static bool higher_priority_ready(void);
 
+/* compare the two threads priority
+Used by thread_foreach() to check if a thread
+has higher priority than another thread.*/
+static bool thread_priority_more(const struct list_elem *a,
+                                 const struct list_elem *b, void *aux UNUSED) {
+  const struct thread *ta = list_entry(a, struct thread, elem);
+  const struct thread *tb = list_entry(b, struct thread, elem);
+
+  return ta->priority > tb->priority;
+}
+
+static bool higher_priority_ready(void) {
+  if (list_empty(&ready_list))
+    return false;
+
+  return list_entry(list_front(&ready_list), struct thread, elem)->priority >
+         thread_current()->priority;
+}
+
 /* Initializes the threading system by transforming the code
    that's currently running into a thread.  This can't work in
    general and it is possible in this case only because loader.S
