@@ -159,6 +159,17 @@ void timer_print_stats(void) {
 /* Timer interrupt handler. */
 static void timer_interrupt(struct intr_frame *args UNUSED) {
   ticks++;
+
+  while (!list_empty(&sleep_list)) {
+    struct thread *t = list_entry(list_front(&sleep_list), struct thread, elem);
+
+    if (t->wake_tick > ticks)
+      break;
+
+    list_pop_front(&sleep_list);
+    thread_unblock(t);
+  }
+
   thread_tick();
 }
 
