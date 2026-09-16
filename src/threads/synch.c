@@ -195,7 +195,7 @@ void lock_acquire(struct lock *lock) {
         /* If the holder is in the ready list, re-sort it to maintain priority
          * order. */
         if (t->status == THREAD_READY) {
-          list_sort(&ready_list, thread_priority_more, NULL);
+          thread_resort_ready_list();
         }
       } else {
         break;

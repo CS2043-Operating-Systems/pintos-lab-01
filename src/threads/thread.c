@@ -111,6 +111,13 @@ void thread_preempt_if_needed(void) {
     thread_yield();
 }
 
+/* Re-sorts ready_list according to thread priorities. */
+void thread_resort_ready_list(void) {
+  if (!list_empty(&ready_list)) {
+    list_sort(&ready_list, thread_priority_more, NULL);
+  }
+}
+
 /* Initializes the threading system by transforming the code
    that's currently running into a thread.  This can't work in
    general and it is possible in this case only because loader.S
