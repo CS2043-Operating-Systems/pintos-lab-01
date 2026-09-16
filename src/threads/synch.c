@@ -241,6 +241,27 @@ void lock_release(struct lock *lock) {
   ASSERT(lock != NULL);
   ASSERT(lock_held_by_current_thread(lock));
 
+  struct thread *cur = thread_current();
+  /* Remove all donors waiting on THIS lock from cur->donations. */
+  struct list_elem *e = list_begin(&cur->donations);
+  while (e != list_end(&cur->donations)) {
+    struct thread *t = list_entry(e, struct thread, donation_elem);
+    if (t->wait_on_lock == lock) {
+      e = list_remove(e);
+    } else {
+      e = list_next(e);
+    }
+  }
+  /* Recalculate effective priority from base_priority and remaining donations.
+   */
+  cur->priority = cur->base_priority;
+  for (e = list_begin(&cur->donations); e != list_end(&cur->donations);
+       e = list_next(e)) {
+    struct thread *t = list_entry(e, struct thread, donation_elem);
+    if (t->priority > cur->priority)
+      cur->priority = t->priority;
+  }
+
   lock->holder = NULL;
   sema_up(&lock->semaphore);
 }
