@@ -108,10 +108,10 @@ void sema_up(struct semaphore *sema) {
         list_entry(list_pop_front(&sema->waiters), struct thread, elem));
   sema->value++;
 
-  /* If the unblocked thread has higher priority than us, yield immediately */
-  thread_preempt_if_needed();
-
   intr_set_level(old_level);
+
+  /* Call preemption AFTER interrupts are re-enabled! */
+  thread_preempt_if_needed();
 }
 
 static void sema_test_helper(void *sema_);
