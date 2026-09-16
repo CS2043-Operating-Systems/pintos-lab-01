@@ -70,15 +70,15 @@ static void schedule(void);
 void thread_schedule_tail(struct thread *prev);
 static tid_t allocate_tid(void);
 
-static bool thread_priority_more(const struct list_elem *a,
-                                 const struct list_elem *b, void *aux);
+bool thread_priority_more(const struct list_elem *a, const struct list_elem *b,
+                          void *aux);
 static bool higher_priority_ready(void);
 
 /* compare the two threads priority
 Used by thread_foreach() to check if a thread
 has higher priority than another thread.*/
-static bool thread_priority_more(const struct list_elem *a,
-                                 const struct list_elem *b, void *aux UNUSED) {
+bool thread_priority_more(const struct list_elem *a, const struct list_elem *b,
+                          void *aux UNUSED) {
   const struct thread *ta = list_entry(a, struct thread, elem);
   const struct thread *tb = list_entry(b, struct thread, elem);
 
