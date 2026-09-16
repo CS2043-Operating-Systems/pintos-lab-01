@@ -447,6 +447,13 @@ static void init_thread(struct thread *t, const char *name, int priority) {
   strlcpy(t->name, name, sizeof t->name);
   t->stack = (uint8_t *)t + PGSIZE;
   t->priority = priority;
+
+  /*Newly added these fields*/
+  t->base_priority = priority;
+  t->wait_on_lock = NULL;
+  list_init(&t->donations);
+  /*end of new fields*/
+
   t->magic = THREAD_MAGIC;
 
   old_level = intr_disable();
