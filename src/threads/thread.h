@@ -4,6 +4,7 @@
 #include <debug.h>
 #include <list.h>
 #include <stdint.h>
+#include "threads/fixed-point.h"
 
 /* States in a thread's life cycle. */
 enum thread_status {
@@ -22,6 +23,11 @@ typedef int tid_t;
 #define PRI_MIN 0      /* Lowest priority. */
 #define PRI_DEFAULT 31 /* Default priority. */
 #define PRI_MAX 63     /* Highest priority. */
+
+/* Thread nice values for MLFQS. */
+#define NICE_MIN -20
+#define NICE_DEFAULT 0
+#define NICE_MAX 20
 
 /* A kernel thread or user process.
 
@@ -100,6 +106,10 @@ struct thread {
   struct list_elem
       donation_elem; /* List element for donor's thread->donations list. */
 
+  /* Advanced Scheduler (MLFQS) */
+  int nice;                 /* Niceness value in range [-20, 20]. */
+  fixed_point_t recent_cpu; /* CPU time received recently. */
+
 #ifdef USERPROG
   /* Owned by userprog/process.c. */
   uint32_t *pagedir; /* Page directory. */
@@ -147,6 +157,12 @@ int thread_get_nice(void);
 void thread_set_nice(int);
 int thread_get_recent_cpu(void);
 int thread_get_load_avg(void);
+
+/* MLFQS helper routines. */
+void thread_mlfqs_increment_recent_cpu(void);
+void thread_mlfqs_update_load_avg_and_recent_cpu(void);
+void thread_mlfqs_recalculate_priorities(void);
+void thread_mlfqs_update_priority(struct thread *t);
 
 #endif /* threads/thread.h */
 
