@@ -93,6 +93,13 @@ struct thread {
   /* Shared between thread.c and synch.c. */
   struct list_elem elem; /* List element. */
 
+  /* Priority Donation */
+  int base_priority;         /* Base priority without donations. */
+  struct lock *wait_on_lock; /* Lock the thread is currently waiting for. */
+  struct list donations; /* List of threads donating priority to this thread. */
+  struct list_elem
+      donation_elem; /* List element for donor's thread->donations list. */
+
 #ifdef USERPROG
   /* Owned by userprog/process.c. */
   uint32_t *pagedir; /* Page directory. */
@@ -106,6 +113,9 @@ struct thread {
    If true, use multi-level feedback queue scheduler.
    Controlled by kernel command-line option "-o mlfqs". */
 extern bool thread_mlfqs;
+
+void thread_preempt_if_needed(void);
+void thread_resort_ready_list(void);
 
 void thread_init(void);
 void thread_start(void);
@@ -139,3 +149,6 @@ int thread_get_recent_cpu(void);
 int thread_get_load_avg(void);
 
 #endif /* threads/thread.h */
+
+bool thread_priority_more(const struct list_elem *a, const struct list_elem *b,
+                          void *aux);
